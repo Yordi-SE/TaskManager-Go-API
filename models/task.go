@@ -17,7 +17,7 @@ var Collections *mongo.Collection
 
 func init() {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	clientOptions := options.Client().ApplyURI("mongodb+srv://yordanoslemmawork:0PjRbe8UhBir4p0Q@cluster0.cyp2ike.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").SetServerAPIOptions(serverAPI)
+	clientOptions := options.Client().ApplyURI("mongodb+srv://yordanoslemmawork:@cluster0.cyp2ike.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err)

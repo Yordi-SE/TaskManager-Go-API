@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/zaahidali/task_manager_api/data"
+	domain "github.com/zaahidali/task_manager_api/Domain"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,9 +24,9 @@ func init() {
 	Collections = Database.Collection("tasks")
 	UserCollection = Database.Collection("User")
 	tasks := []interface{}{
-		data.Tasks[0],
-		data.Tasks[1],
-		data.Tasks[2],
+		domain.Tasks[0],
+		domain.Tasks[1],
+		domain.Tasks[2],
 	}
 	fmt.Println("Collection instance created!")
 	Collections.DeleteMany(context.TODO(), bson.D{{}})

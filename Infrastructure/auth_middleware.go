@@ -1,7 +1,8 @@
-package middleware
+package Infrastructure
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -51,7 +52,41 @@ func AuthMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+			ctx.Set("claims", claims)
+		} else {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			ctx.Abort()
+			return
+		}
 		ctx.Next()
 
+	}
+}
+
+// Isadmin middleware
+func Isadmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims, exists := c.Get("claims")
+		if !exists {
+			c.JSON(http.StatusForbidden, gin.H{"error": "No token claims found"})
+			c.Abort()
+			return
+		}
+
+		jwtClaims, ok := claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		if role, ok := jwtClaims["role"].(string); !ok || role != "admin" {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You don't have the required role"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
 	}
 }

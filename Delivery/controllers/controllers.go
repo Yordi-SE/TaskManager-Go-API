@@ -1,35 +1,20 @@
 package controllers
 
 import (
-	"github.com/zaahidali/task_manager_api/models"
-	"go.mongodb.org/mongo-driver/bson"
+	usecases "github.com/zaahidali/task_manager_api/Usecases"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zaahidali/task_manager_api/data"
+	domain "github.com/zaahidali/task_manager_api/Domain"
 )
 
 func GetTasks(ctx *gin.Context) {
-	var results []data.Task
-
-	findOptions := options.Find()
-	cur, err := models.Collections.Find(ctx, bson.M{}, findOptions)
+	result, err := usecases.GetAlltasks(ctx)
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return
 	}
-	for cur.Next(ctx) {
-		var elem data.Task
-		err := cur.Decode(&elem)
-		if err != nil {
-			ctx.IndentedJSON(500, gin.H{"message": err.Error()})
-			return
-		}
-
-		results = append(results, elem)
-	}
-	ctx.IndentedJSON(200, results)
+	ctx.IndentedJSON(200, result)
 }
 
 func GetTasksId(ctx *gin.Context) {
@@ -38,8 +23,8 @@ func GetTasksId(ctx *gin.Context) {
 	if errs != nil {
 		ctx.IndentedJSON(404, gin.H{"message": errs.Error()})
 	}
-	var tasks data.Task
-	err := models.Collections.FindOne(ctx, bson.D{{Key: "_id", Value: Id}}).Decode(&tasks)
+	tasks, err := usecases.GetSpecificTask(ctx, Id)
+
 	if err != nil {
 		ctx.IndentedJSON(404, gin.H{"message": err.Error()})
 		return
@@ -49,18 +34,18 @@ func GetTasksId(ctx *gin.Context) {
 }
 
 func CreateTask(ctx *gin.Context) {
-	var task data.Task
+	var task domain.Task
 	err := ctx.BindJSON(&task)
 	if err != nil {
 		ctx.IndentedJSON(400, gin.H{"message": err.Error()})
 		return
 	}
-	result, err := models.Collections.InsertOne(ctx, task)
+	result, err := usecases.CreateTask(ctx, task)
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return
 	}
-	ctx.IndentedJSON(201, result.InsertedID)
+	ctx.IndentedJSON(201, result)
 }
 
 func UpdateTask(ctx *gin.Context) {
@@ -70,21 +55,14 @@ func UpdateTask(ctx *gin.Context) {
 		ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
 		return
 	}
-	var task data.Task
+	var task domain.Task
 	errs := ctx.BindJSON(&task)
 	if errs != nil {
 		ctx.IndentedJSON(400, gin.H{"message": errs.Error()})
 		return
 	}
-	result, err := models.Collections.UpdateByID(ctx, Id, bson.D{
-		{
-			Key: "$set",
-			Value: bson.D{
-				{Key: "title", Value: task.Title},
-				{Key: "description", Value: task.Description},
-			},
-		},
-	})
+	result, err := usecases.UpdateTask(ctx, Id, task)
+
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return
@@ -100,10 +78,10 @@ func DeleteTask(ctx *gin.Context) {
 		ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
 		return
 	}
-	result, err := models.Collections.DeleteOne(ctx, bson.M{"_id": Id})
+	result, err := usecases.DeleteTask(ctx, Id)
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return
 	}
-	ctx.IndentedJSON(200, result.DeletedCount)
+	ctx.IndentedJSON(200, result)
 }

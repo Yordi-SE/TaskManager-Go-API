@@ -1,4 +1,4 @@
-package models
+package repositories
 
 import (
 	"context"
@@ -7,9 +7,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	domain "github.com/zaahidali/task_manager_api/Domain"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,14 +21,7 @@ func init() {
 	Database = ConnectDB()
 	Collections = Database.Collection("tasks")
 	UserCollection = Database.Collection("User")
-	tasks := []interface{}{
-		domain.Tasks[0],
-		domain.Tasks[1],
-		domain.Tasks[2],
-	}
 	fmt.Println("Collection instance created!")
-	Collections.DeleteMany(context.TODO(), bson.D{{}})
-	Collections.InsertMany(context.TODO(), tasks)
 }
 func ConnectDB() *mongo.Database {
 	var Database *mongo.Database

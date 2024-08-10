@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"fmt"
+
 	domain "github.com/zaahidali/task_manager_api/Domain"
 	repositories "github.com/zaahidali/task_manager_api/Repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -51,6 +53,9 @@ func DeleteTask(id primitive.ObjectID) (interface{}, error) {
 	result, err := repositories.DeleteTask(id)
 	if err != nil {
 		return nil, err
+	}
+	if result.DeletedCount == 0 {
+		return nil, fmt.Errorf("task not found")
 	}
 	return result.DeletedCount, nil
 }

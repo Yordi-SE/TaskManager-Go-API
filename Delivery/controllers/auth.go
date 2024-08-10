@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
+	domain "github.com/zaahidali/task_manager_api/Domain"
 	usecases "github.com/zaahidali/task_manager_api/Usecases"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zaahidali/task_manager_api/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // auth handler
 
 func Register(ctx *gin.Context) {
-	var user models.User
+	var user domain.User
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.IndentedJSON(400, gin.H{"message": err.Error()})
 		return
@@ -31,7 +31,7 @@ func Register(ctx *gin.Context) {
 // login handler
 
 func Login(ctx *gin.Context) {
-	var user models.User
+	var user domain.User
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.IndentedJSON(400, gin.H{"message": err.Error()})
@@ -68,6 +68,6 @@ func Promote(ctx *gin.Context) {
 		ctx.IndentedJSON(400, gin.H{"message": err.Error()})
 		return
 	}
-	ctx.IndentedJSON(400, gin.H{"message": "promotion was successful"})
+	ctx.IndentedJSON(200, gin.H{"message": "promotion was successful"})
 
 }

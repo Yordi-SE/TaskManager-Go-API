@@ -5,7 +5,6 @@ import (
 	"time"
 
 	domain "github.com/zaahidali/task_manager_api/Domain"
-	"github.com/zaahidali/task_manager_api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +20,7 @@ func GetAll() ([]domain.Task, error) {
 	var results []domain.Task
 
 	findOptions := options.Find()
-	cur, err := models.Collections.Find(ctx, bson.M{}, findOptions)
+	cur, err := Collections.Find(ctx, bson.M{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +40,7 @@ func GetSpecificTask(id primitive.ObjectID) (domain.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var task domain.Task
-	err := models.Collections.FindOne(ctx, bson.M{"_id": id}).Decode(&task)
+	err := Collections.FindOne(ctx, bson.M{"_id": id}).Decode(&task)
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -52,7 +51,7 @@ func GetSpecificTask(id primitive.ObjectID) (domain.Task, error) {
 func CreateTask(task domain.Task) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	result, err := models.Collections.InsertOne(ctx, task)
+	result, err := Collections.InsertOne(ctx, task)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +62,7 @@ func CreateTask(task domain.Task) (*mongo.InsertOneResult, error) {
 func UpdateTask(id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	result, err := models.Collections.UpdateByID(ctx, id, bson.D{
+	result, err := Collections.UpdateByID(ctx, id, bson.D{
 		{
 			Key: "$set",
 			Value: bson.D{
@@ -82,7 +81,7 @@ func UpdateTask(id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, e
 func DeleteTask(id primitive.ObjectID) (*mongo.DeleteResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	result, err := models.Collections.DeleteOne(ctx, bson.M{"_id": id})
+	result, err := Collections.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
 		return nil, err
 	}

@@ -3,23 +3,23 @@ package usecases
 import (
 	"fmt"
 
+	domain "github.com/zaahidali/task_manager_api/Domain"
 	"github.com/zaahidali/task_manager_api/Infrastructure"
 	repositories "github.com/zaahidali/task_manager_api/Repositories"
-	"github.com/zaahidali/task_manager_api/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // user usecase
 
-func Register(user models.User) (interface{}, error) {
+func Register(user domain.User) (interface{}, error) {
 
 	hashedPassword, err := Infrastructure.HashPassword(user.Password)
 	if err != nil {
 		return nil, err
 	}
 	user.Password = string(hashedPassword)
-	userCount, err := repositories.Count(models.UserCollection)
+	userCount, err := repositories.Count(repositories.UserCollection)
 	if err != nil {
 		return nil, err
 	}
@@ -28,14 +28,14 @@ func Register(user models.User) (interface{}, error) {
 	} else {
 		user.Role = "user"
 	}
-	var existing models.User
+	var existing domain.User
 	existing, errs := repositories.FindUserByName(user.UserName)
 	if errs != nil {
 		if errs != mongo.ErrNoDocuments {
 			return nil, errs
 		}
 	}
-	if existing != (models.User{}) && existing.UserName == user.UserName {
+	if existing != (domain.User{}) && existing.UserName == user.UserName {
 		return nil, fmt.Errorf("user already exists")
 	}
 	if existing.UserName == user.UserName {
@@ -50,21 +50,26 @@ func Register(user models.User) (interface{}, error) {
 
 // promote user
 func Promote(user_id primitive.ObjectID) error {
-	err := repositories.Promote(user_id)
+	result, err := repositories.Promote(user_id)
 	if err != nil {
 		return err
+	}
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("user not found")
+	}
+	if result.ModifiedCount == 0 {
+		return fmt.Errorf("user is admin")
 	}
 	return nil
 }
 
-func Login(data models.User) (string, error) {
-	var result models.User
+func Login(data domain.User) (string, error) {
+	var result domain.User
 	result, errs := repositories.FindUserByName(data.UserName)
 	if errs != nil {
 		return "", errs
 	}
 	err := Infrastructure.ComparePasswords(result.Password, data.Password)
-	fmt.Println(result.Password, data.Password, "<=password")
 	if err != nil {
 		return "", err
 	}

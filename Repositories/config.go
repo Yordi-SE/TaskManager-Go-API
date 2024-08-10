@@ -17,12 +17,6 @@ var Collections *mongo.Collection
 var Database *mongo.Database
 var UserCollection *mongo.Collection
 
-func init() {
-	Database = ConnectDB()
-	Collections = Database.Collection("tasks")
-	UserCollection = Database.Collection("User")
-	fmt.Println("Collection instance created!")
-}
 func ConnectDB() *mongo.Database {
 	var Database *mongo.Database
 

@@ -1,4 +1,8 @@
 TaskManager API Documentation
+
+Refer to the postman documentation
+https://documenter.getpostman.com/view/37514043/2sA3rzKCjd
+
 Overview
 The TaskManager API provides functionality for managing tasks and user authentication. The API supports operations such as creating, reading, updating, and deleting tasks, as well as user registration, login, and role promotion.
 

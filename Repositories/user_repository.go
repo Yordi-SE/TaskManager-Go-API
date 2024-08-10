@@ -10,6 +10,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// Abstracts the data access logic.
+// The repository pattern is a design pattern that isolates the data access logic from the rest of the application.
+type UserRepositoryInterface interface {
+	CreateUser(user domain.User) (*mongo.InsertOneResult, error)
+	FindUser(user_id primitive.ObjectID) (domain.User, error)
+	FindUserByName(user_name string) (domain.User, error)
+	Promote(user_id primitive.ObjectID) (*mongo.UpdateResult, error)
+}
+
+var UserRepository UserRepositoryInterface
+
 // create user
 func CreateUser(user domain.User) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

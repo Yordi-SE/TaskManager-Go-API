@@ -14,6 +14,17 @@ import (
 //Abstracts the data access logic.
 //The repository pattern is a design pattern that isolates the data access logic from the rest of the application.
 
+type TaskRepositoryInterface interface {
+	GetAll() ([]domain.Task, error)
+	GetSpecificTask(id primitive.ObjectID) (domain.Task, error)
+	CreateTask(task domain.Task) (*mongo.InsertOneResult, error)
+	UpdateTask(id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, error)
+	DeleteTask(id primitive.ObjectID) (*mongo.DeleteResult, error)
+	Count(col *mongo.Collection) (int64, error)
+}
+
+var TaskRepository TaskRepositoryInterface
+
 func GetAll() ([]domain.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()

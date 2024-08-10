@@ -23,7 +23,7 @@ func GetAlltasks() (datas []domain.Task, err error) {
 // Get specific task
 
 func GetSpecificTask(id primitive.ObjectID) (datas domain.Task, err error) {
-	result, err := repositories.GetSpecificTask(id)
+	result, err := repositories.TaskRepository.GetSpecificTask(id)
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -32,7 +32,7 @@ func GetSpecificTask(id primitive.ObjectID) (datas domain.Task, err error) {
 
 // Create task
 func CreateTask(task domain.Task) (interface{}, error) {
-	result, err := repositories.CreateTask(task)
+	result, err := repositories.TaskRepository.CreateTask(task)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func CreateTask(task domain.Task) (interface{}, error) {
 
 // Update task
 func UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error) {
-	result, err := repositories.UpdateTask(id, task)
+	result, err := repositories.TaskRepository.UpdateTask(id, task)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error) {
 
 // Delete task
 func DeleteTask(id primitive.ObjectID) (interface{}, error) {
-	result, err := repositories.DeleteTask(id)
+	result, err := repositories.TaskRepository.DeleteTask(id)
 	if err != nil {
 		return nil, err
 	}

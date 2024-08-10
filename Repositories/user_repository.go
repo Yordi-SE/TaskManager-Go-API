@@ -1,7 +1,9 @@
 package repositories
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+	"time"
+
 	"github.com/zaahidali/task_manager_api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -9,7 +11,10 @@ import (
 )
 
 // create user
-func CreateUser(ctx *gin.Context, user models.User) (*mongo.InsertOneResult, error) {
+func CreateUser(user models.User) (*mongo.InsertOneResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
 	result, err := models.UserCollection.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
@@ -18,7 +23,9 @@ func CreateUser(ctx *gin.Context, user models.User) (*mongo.InsertOneResult, err
 }
 
 // find user
-func FindUser(ctx *gin.Context, user_id primitive.ObjectID) (models.User, error) {
+func FindUser(user_id primitive.ObjectID) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	var user models.User
 	err := models.UserCollection.FindOne(ctx, bson.M{"_id": user_id}).Decode(&user)
 	if err != nil {
@@ -27,7 +34,9 @@ func FindUser(ctx *gin.Context, user_id primitive.ObjectID) (models.User, error)
 	return user, nil
 }
 
-func Promote(ctx *gin.Context, user_id primitive.ObjectID) error {
+func Promote(user_id primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	_, err := models.UserCollection.UpdateByID(ctx, user_id, bson.D{
 		{
 			Key: "$set",
@@ -41,4 +50,16 @@ func Promote(ctx *gin.Context, user_id primitive.ObjectID) error {
 	}
 	return nil
 
+}
+
+// find user by user_name
+func FindUserByName(user_name string) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	var user models.User
+	err := models.UserCollection.FindOne(ctx, bson.M{"username": user_name}).Decode(&user)
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
 }

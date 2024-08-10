@@ -12,17 +12,17 @@ import (
 )
 
 // GenerateToken generates a JWT token
-func GenerateToken(email string, id primitive.ObjectID, role string) (string, error) {
+func GenerateToken(user_name string, id primitive.ObjectID, role string) (string, error) {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
 	secret := os.Getenv("jwtSecret")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":   email,
-		"user_id": id,
-		"role":    role,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"user_name": user_name,
+		"user_id":   id,
+		"role":      role,
+		"exp":       time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(secret))
 	return tokenString, err

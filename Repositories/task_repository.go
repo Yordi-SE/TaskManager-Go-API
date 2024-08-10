@@ -1,7 +1,9 @@
 package repositories
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+	"time"
+
 	domain "github.com/zaahidali/task_manager_api/Domain"
 	"github.com/zaahidali/task_manager_api/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,8 +15,9 @@ import (
 //Abstracts the data access logic.
 //The repository pattern is a design pattern that isolates the data access logic from the rest of the application.
 
-func GetAll(ctx *gin.Context) ([]domain.Task, error) {
-
+func GetAll() ([]domain.Task, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	var results []domain.Task
 
 	findOptions := options.Find()
@@ -22,7 +25,7 @@ func GetAll(ctx *gin.Context) ([]domain.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	for cur.Next(ctx) {
+	for cur.Next(context.Background()) {
 		var elem domain.Task
 		err := cur.Decode(&elem)
 		if err != nil {
@@ -34,7 +37,9 @@ func GetAll(ctx *gin.Context) ([]domain.Task, error) {
 	return results, nil
 }
 
-func GetSpecificTask(ctx *gin.Context, id primitive.ObjectID) (domain.Task, error) {
+func GetSpecificTask(id primitive.ObjectID) (domain.Task, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	var task domain.Task
 	err := models.Collections.FindOne(ctx, bson.M{"_id": id}).Decode(&task)
 	if err != nil {
@@ -44,7 +49,9 @@ func GetSpecificTask(ctx *gin.Context, id primitive.ObjectID) (domain.Task, erro
 }
 
 // create task
-func CreateTask(ctx *gin.Context, task domain.Task) (*mongo.InsertOneResult, error) {
+func CreateTask(task domain.Task) (*mongo.InsertOneResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	result, err := models.Collections.InsertOne(ctx, task)
 	if err != nil {
 		return nil, err
@@ -53,7 +60,9 @@ func CreateTask(ctx *gin.Context, task domain.Task) (*mongo.InsertOneResult, err
 }
 
 // update task
-func UpdateTask(ctx *gin.Context, id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, error) {
+func UpdateTask(id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	result, err := models.Collections.UpdateByID(ctx, id, bson.D{
 		{
 			Key: "$set",
@@ -70,7 +79,9 @@ func UpdateTask(ctx *gin.Context, id primitive.ObjectID, task domain.Task) (*mon
 }
 
 // delete task
-func DeleteTask(ctx *gin.Context, id primitive.ObjectID) (*mongo.DeleteResult, error) {
+func DeleteTask(id primitive.ObjectID) (*mongo.DeleteResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	result, err := models.Collections.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
 		return nil, err
@@ -79,7 +90,9 @@ func DeleteTask(ctx *gin.Context, id primitive.ObjectID) (*mongo.DeleteResult, e
 }
 
 // count specific collection
-func Count(ctx *gin.Context, col *mongo.Collection) (int64, error) {
+func Count(col *mongo.Collection) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	count, err := col.CountDocuments(ctx, bson.D{})
 	if err != nil {
 		return 0, err

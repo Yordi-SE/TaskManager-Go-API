@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"github.com/gin-gonic/gin"
 	domain "github.com/zaahidali/task_manager_api/Domain"
 	repositories "github.com/zaahidali/task_manager_api/Repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,8 +9,8 @@ import (
 //Implements the use cases related to tasks, such as creating, updating, retrieving, and deleting tasks.
 
 // Get all tasks
-func GetAlltasks(ctx *gin.Context) (datas []domain.Task, err error) {
-	result, err := repositories.GetAll(ctx)
+func GetAlltasks() (datas []domain.Task, err error) {
+	result, err := repositories.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +20,8 @@ func GetAlltasks(ctx *gin.Context) (datas []domain.Task, err error) {
 
 // Get specific task
 
-func GetSpecificTask(ctx *gin.Context, id primitive.ObjectID) (datas domain.Task, err error) {
-	result, err := repositories.GetSpecificTask(ctx, id)
+func GetSpecificTask(id primitive.ObjectID) (datas domain.Task, err error) {
+	result, err := repositories.GetSpecificTask(id)
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -30,8 +29,8 @@ func GetSpecificTask(ctx *gin.Context, id primitive.ObjectID) (datas domain.Task
 }
 
 // Create task
-func CreateTask(ctx *gin.Context, task domain.Task) (interface{}, error) {
-	result, err := repositories.CreateTask(ctx, task)
+func CreateTask(task domain.Task) (interface{}, error) {
+	result, err := repositories.CreateTask(task)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +38,8 @@ func CreateTask(ctx *gin.Context, task domain.Task) (interface{}, error) {
 }
 
 // Update task
-func UpdateTask(ctx *gin.Context, id primitive.ObjectID, task domain.Task) (interface{}, error) {
-	result, err := repositories.UpdateTask(ctx, id, task)
+func UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error) {
+	result, err := repositories.UpdateTask(id, task)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +47,8 @@ func UpdateTask(ctx *gin.Context, id primitive.ObjectID, task domain.Task) (inte
 }
 
 // Delete task
-func DeleteTask(ctx *gin.Context, id primitive.ObjectID) (interface{}, error) {
-	result, err := repositories.DeleteTask(ctx, id)
+func DeleteTask(id primitive.ObjectID) (interface{}, error) {
+	result, err := repositories.DeleteTask(id)
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func GetTasks(ctx *gin.Context) {
-	result, err := usecases.GetAlltasks(ctx)
+	result, err := usecases.GetAlltasks()
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return
@@ -23,7 +23,7 @@ func GetTasksId(ctx *gin.Context) {
 	if errs != nil {
 		ctx.IndentedJSON(404, gin.H{"message": errs.Error()})
 	}
-	tasks, err := usecases.GetSpecificTask(ctx, Id)
+	tasks, err := usecases.GetSpecificTask(Id)
 
 	if err != nil {
 		ctx.IndentedJSON(404, gin.H{"message": err.Error()})
@@ -40,7 +40,7 @@ func CreateTask(ctx *gin.Context) {
 		ctx.IndentedJSON(400, gin.H{"message": err.Error()})
 		return
 	}
-	result, err := usecases.CreateTask(ctx, task)
+	result, err := usecases.CreateTask(task)
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return
@@ -61,7 +61,7 @@ func UpdateTask(ctx *gin.Context) {
 		ctx.IndentedJSON(400, gin.H{"message": errs.Error()})
 		return
 	}
-	result, err := usecases.UpdateTask(ctx, Id, task)
+	result, err := usecases.UpdateTask(Id, task)
 
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
@@ -78,7 +78,7 @@ func DeleteTask(ctx *gin.Context) {
 		ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
 		return
 	}
-	result, err := usecases.DeleteTask(ctx, Id)
+	result, err := usecases.DeleteTask(Id)
 	if err != nil {
 		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
 		return

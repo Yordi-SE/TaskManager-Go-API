@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/zaahidali/task_manager_api/models"
@@ -37,7 +38,7 @@ func FindUser(user_id primitive.ObjectID) (models.User, error) {
 func Promote(user_id primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	_, err := models.UserCollection.UpdateByID(ctx, user_id, bson.D{
+	r, err := models.UserCollection.UpdateByID(ctx, user_id, bson.D{
 		{
 			Key: "$set",
 			Value: bson.D{
@@ -45,6 +46,9 @@ func Promote(user_id primitive.ObjectID) error {
 			},
 		},
 	})
+	if r.MatchedCount == 0 {
+		return fmt.Errorf("user not found")
+	}
 	if err != nil {
 		return err
 	}

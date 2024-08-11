@@ -24,10 +24,7 @@ json
   "title": "",
   "description": ""
 }
-AUTHORIZATION
-Bearer Token
-Token
-<token>
+
 
 Example Request
 Get Task By Id
@@ -62,10 +59,7 @@ json
   "title": "string",
   "description": "string"
 }
-AUTHORIZATION
-Bearer Token
-Token
-<token>
+
 
 Body
 raw (json)

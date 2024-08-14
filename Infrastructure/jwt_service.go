@@ -12,7 +12,7 @@ import (
 )
 
 // GenerateToken generates a JWT token
-func GenerateToken(user_name string, id primitive.ObjectID, role string) (string, error) {
+func (*Infrastructure) GenerateToken(user_name string, id primitive.ObjectID, role string) (string, error) {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -29,7 +29,7 @@ func GenerateToken(user_name string, id primitive.ObjectID, role string) (string
 }
 
 // ValidateToken validates a JWT token
-func ValidateToken(tokenString string) (bool, error) {
+func (*Infrastructure) ValidateToken(tokenString string) (bool, error) {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")

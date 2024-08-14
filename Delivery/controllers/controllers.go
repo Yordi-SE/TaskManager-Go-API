@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	usecases "github.com/zaahidali/task_manager_api/Usecases"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -8,80 +10,98 @@ import (
 	domain "github.com/zaahidali/task_manager_api/Domain"
 )
 
-func GetTasks(ctx *gin.Context) {
-	result, err := usecases.GetAlltasks()
-	if err != nil {
-		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
-		return
-	}
-	ctx.IndentedJSON(200, result)
+type TaskHandler struct {
+	UserUsecase usecases.UserUseCaseInterface
+	TaskUsecase usecases.TaskUseCaseInterface
 }
 
-func GetTasksId(ctx *gin.Context) {
-	id := ctx.Param("id")
-	Id, errs := primitive.ObjectIDFromHex(id)
-	if errs != nil {
-		ctx.IndentedJSON(404, gin.H{"message": errs.Error()})
+func (taskcontroller *TaskHandler) GetTasks() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		result, err := taskcontroller.TaskUsecase.GetAlltasks()
+		if err != nil {
+			ctx.IndentedJSON(500, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.IndentedJSON(200, result)
 	}
-	tasks, err := usecases.GetSpecificTask(Id)
-
-	if err != nil {
-		ctx.IndentedJSON(404, gin.H{"message": err.Error()})
-		return
-	}
-	ctx.IndentedJSON(200, tasks)
-
 }
 
-func CreateTask(ctx *gin.Context) {
-	var task domain.Task
-	err := ctx.BindJSON(&task)
-	if err != nil {
-		ctx.IndentedJSON(400, gin.H{"message": err.Error()})
-		return
+func (taskcontroller *TaskHandler) GetTasksId() gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		Id, errs := primitive.ObjectIDFromHex(id)
+		if errs != nil {
+			ctx.IndentedJSON(404, gin.H{"message": errs.Error()})
+			return
+		}
+		tasks, err := taskcontroller.TaskUsecase.GetSpecificTask(Id)
+
+		if err != nil {
+			ctx.IndentedJSON(404, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.IndentedJSON(200, tasks)
+
 	}
-	result, err := usecases.CreateTask(task)
-	if err != nil {
-		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
-		return
-	}
-	ctx.IndentedJSON(201, result)
 }
 
-func UpdateTask(ctx *gin.Context) {
-	id := ctx.Param("id")
-	Id, errss := primitive.ObjectIDFromHex(id)
-	if errss != nil {
-		ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
-		return
+func (taskcontroller *TaskHandler) CreateTask() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var task domain.Task
+		err := ctx.BindJSON(&task)
+		if err != nil {
+			ctx.IndentedJSON(400, gin.H{"message": err.Error()})
+			return
+		}
+		result, err := taskcontroller.TaskUsecase.CreateTask(task)
+		if err != nil {
+			fmt.Println(err)
+			ctx.IndentedJSON(500, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.IndentedJSON(201, result)
 	}
-	var task domain.Task
-	errs := ctx.BindJSON(&task)
-	if errs != nil {
-		ctx.IndentedJSON(400, gin.H{"message": errs.Error()})
-		return
-	}
-	result, err := usecases.UpdateTask(Id, task)
-
-	if err != nil {
-		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
-		return
-	}
-
-	ctx.IndentedJSON(200, result)
 }
 
-func DeleteTask(ctx *gin.Context) {
-	id := ctx.Param("id")
-	Id, errss := primitive.ObjectIDFromHex(id)
-	if errss != nil {
-		ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
-		return
+func (taskcontroller *TaskHandler) UpdateTask() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		Id, errss := primitive.ObjectIDFromHex(id)
+		if errss != nil {
+			ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
+			return
+		}
+		var task domain.Task
+		errs := ctx.BindJSON(&task)
+		if errs != nil {
+			ctx.IndentedJSON(400, gin.H{"message": errs.Error()})
+			return
+		}
+		result, err := taskcontroller.TaskUsecase.UpdateTask(Id, task)
+
+		if err != nil {
+			ctx.IndentedJSON(500, gin.H{"message": err.Error()})
+			return
+		}
+
+		ctx.IndentedJSON(200, result)
 	}
-	result, err := usecases.DeleteTask(Id)
-	if err != nil {
-		ctx.IndentedJSON(500, gin.H{"message": err.Error()})
-		return
+}
+
+func (taskcontroller *TaskHandler) DeleteTask() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		Id, errss := primitive.ObjectIDFromHex(id)
+		if errss != nil {
+			ctx.IndentedJSON(404, gin.H{"message": errss.Error()})
+			return
+		}
+		result, err := taskcontroller.TaskUsecase.DeleteTask(Id)
+		if err != nil {
+			ctx.IndentedJSON(500, gin.H{"message": err.Error()})
+			return
+		}
+		ctx.IndentedJSON(200, result)
 	}
-	ctx.IndentedJSON(200, result)
 }

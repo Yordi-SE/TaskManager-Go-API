@@ -10,16 +10,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type UserUseCase struct {
+	TaskRepository repositories.TaskRepositoryInterface
+	UserRepository repositories.UserRepositoryInterface
+	Infrastracture Infrastructure.InfrastructureInterface
+}
+
 // user usecase
 
-func Register(user domain.User) (interface{}, error) {
+func (userusecases *UserUseCase) Register(user domain.User) (interface{}, error) {
 
-	hashedPassword, err := Infrastructure.HashPassword(user.Password)
+	hashedPassword, err := userusecases.Infrastracture.HashPassword(user.Password)
 	if err != nil {
 		return nil, err
 	}
 	user.Password = string(hashedPassword)
-	userCount, err := repositories.TaskRepository.Count(repositories.UserCollection)
+	userCount, err := userusecases.TaskRepository.Count(repositories.UserCollection)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +35,7 @@ func Register(user domain.User) (interface{}, error) {
 		user.Role = "user"
 	}
 	var existing domain.User
-	existing, errs := repositories.UserRepository.FindUserByName(user.UserName)
+	existing, errs := userusecases.UserRepository.FindUserByName(user.UserName)
 	if errs != nil {
 		if errs != mongo.ErrNoDocuments {
 			return nil, errs
@@ -41,7 +47,7 @@ func Register(user domain.User) (interface{}, error) {
 	if existing.UserName == user.UserName {
 		return nil, fmt.Errorf("user already exists")
 	}
-	result, errs := repositories.UserRepository.CreateUser(user)
+	result, errs := userusecases.UserRepository.CreateUser(user)
 	if errs != nil {
 		return nil, errs
 	}
@@ -49,8 +55,8 @@ func Register(user domain.User) (interface{}, error) {
 }
 
 // promote user
-func Promote(user_id primitive.ObjectID) error {
-	result, err := repositories.UserRepository.Promote(user_id)
+func (userusecases *UserUseCase) Promote(user_id primitive.ObjectID) error {
+	result, err := userusecases.UserRepository.Promote(user_id)
 	if err != nil {
 		return err
 	}
@@ -63,17 +69,17 @@ func Promote(user_id primitive.ObjectID) error {
 	return nil
 }
 
-func Login(data domain.User) (string, error) {
+func (userusecases *UserUseCase) Login(data domain.User) (string, error) {
 	var result domain.User
-	result, errs := repositories.UserRepository.FindUserByName(data.UserName)
+	result, errs := userusecases.UserRepository.FindUserByName(data.UserName)
 	if errs != nil {
 		return "", errs
 	}
-	err := Infrastructure.ComparePasswords(result.Password, data.Password)
+	err := userusecases.Infrastracture.ComparePasswords(result.Password, data.Password)
 	if err != nil {
 		return "", err
 	}
-	jwtToken, err := Infrastructure.GenerateToken(result.UserName, result.ID, result.Role)
+	jwtToken, err := userusecases.Infrastracture.GenerateToken(result.UserName, result.ID, result.Role)
 	if err != nil {
 		return "", err
 	}

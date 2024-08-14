@@ -10,6 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type UserRepository struct {
+}
+
 // Abstracts the data access logic.
 // The repository pattern is a design pattern that isolates the data access logic from the rest of the application.
 type UserRepositoryInterface interface {
@@ -19,10 +22,8 @@ type UserRepositoryInterface interface {
 	Promote(user_id primitive.ObjectID) (*mongo.UpdateResult, error)
 }
 
-var UserRepository UserRepositoryInterface
-
 // create user
-func CreateUser(user domain.User) (*mongo.InsertOneResult, error) {
+func (*UserRepository) CreateUser(user domain.User) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -34,7 +35,7 @@ func CreateUser(user domain.User) (*mongo.InsertOneResult, error) {
 }
 
 // find user
-func FindUser(user_id primitive.ObjectID) (domain.User, error) {
+func (*UserRepository) FindUser(user_id primitive.ObjectID) (domain.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var user domain.User
@@ -45,7 +46,7 @@ func FindUser(user_id primitive.ObjectID) (domain.User, error) {
 	return user, nil
 }
 
-func Promote(user_id primitive.ObjectID) (*mongo.UpdateResult, error) {
+func (*UserRepository) Promote(user_id primitive.ObjectID) (*mongo.UpdateResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	r, err := UserCollection.UpdateByID(ctx, user_id, bson.D{
@@ -65,7 +66,7 @@ func Promote(user_id primitive.ObjectID) (*mongo.UpdateResult, error) {
 }
 
 // find user by user_name
-func FindUserByName(user_name string) (domain.User, error) {
+func (*UserRepository) FindUserByName(user_name string) (domain.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var user domain.User

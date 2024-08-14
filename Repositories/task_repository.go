@@ -14,7 +14,11 @@ import (
 // Abstracts the data access logic.
 // The repository pattern is a design pattern that isolates the data access logic from the rest of the application.
 type TaskRepository struct {
+	TaskCollection *mongo.Collection
+	UserCollection *mongo.Collection
+	Database       *mongo.Database
 }
+
 type TaskRepositoryInterface interface {
 	GetAll() ([]domain.Task, error)
 	GetSpecificTask(id primitive.ObjectID) (domain.Task, error)
@@ -24,13 +28,13 @@ type TaskRepositoryInterface interface {
 	Count(col *mongo.Collection) (int64, error)
 }
 
-func (*TaskRepository) GetAll() ([]domain.Task, error) {
+func (taskrepository *TaskRepository) GetAll() ([]domain.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var results []domain.Task
 
 	findOptions := options.Find()
-	cur, err := Collections.Find(ctx, bson.M{}, findOptions)
+	cur, err := taskrepository.TaskCollection.Find(ctx, bson.M{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -46,11 +50,11 @@ func (*TaskRepository) GetAll() ([]domain.Task, error) {
 	return results, nil
 }
 
-func (*TaskRepository) GetSpecificTask(id primitive.ObjectID) (domain.Task, error) {
+func (taskrepository *TaskRepository) GetSpecificTask(id primitive.ObjectID) (domain.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var task domain.Task
-	err := Collections.FindOne(ctx, bson.M{"_id": id}).Decode(&task)
+	err := taskrepository.TaskCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&task)
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -58,10 +62,10 @@ func (*TaskRepository) GetSpecificTask(id primitive.ObjectID) (domain.Task, erro
 }
 
 // create task
-func (*TaskRepository) CreateTask(task domain.Task) (*mongo.InsertOneResult, error) {
+func (taskrepository *TaskRepository) CreateTask(task domain.Task) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	result, err := Collections.InsertOne(ctx, task)
+	result, err := taskrepository.TaskCollection.InsertOne(ctx, task)
 	if err != nil {
 		return nil, err
 	}
@@ -69,10 +73,10 @@ func (*TaskRepository) CreateTask(task domain.Task) (*mongo.InsertOneResult, err
 }
 
 // update task
-func (*TaskRepository) UpdateTask(id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, error) {
+func (taskrepository *TaskRepository) UpdateTask(id primitive.ObjectID, task domain.Task) (*mongo.UpdateResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	result, err := Collections.UpdateByID(ctx, id, bson.D{
+	result, err := taskrepository.TaskCollection.UpdateByID(ctx, id, bson.D{
 		{
 			Key: "$set",
 			Value: bson.D{
@@ -88,10 +92,10 @@ func (*TaskRepository) UpdateTask(id primitive.ObjectID, task domain.Task) (*mon
 }
 
 // delete task
-func (*TaskRepository) DeleteTask(id primitive.ObjectID) (*mongo.DeleteResult, error) {
+func (taskrepository *TaskRepository) DeleteTask(id primitive.ObjectID) (*mongo.DeleteResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	result, err := Collections.DeleteOne(ctx, bson.M{"_id": id})
+	result, err := taskrepository.TaskCollection.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +103,7 @@ func (*TaskRepository) DeleteTask(id primitive.ObjectID) (*mongo.DeleteResult, e
 }
 
 // count specific collection
-func (*TaskRepository) Count(col *mongo.Collection) (int64, error) {
+func (taskrepository *TaskRepository) Count(col *mongo.Collection) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	count, err := col.CountDocuments(ctx, bson.D{})

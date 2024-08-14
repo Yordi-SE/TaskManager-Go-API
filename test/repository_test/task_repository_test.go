@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/suite"
 	domain "github.com/zaahidali/task_manager_api/Domain"
 	repositories "github.com/zaahidali/task_manager_api/Repositories"
@@ -27,10 +26,7 @@ type TaskRepositoryTestSuite struct {
 
 // SetupSuite runs before all tests
 func (suite *TaskRepositoryTestSuite) SetupTest() {
-	errs := godotenv.Load()
-	if errs != nil {
-		log.Fatal("Error loading .env file", errs)
-	}
+
 	var db_url = os.Getenv("DB_URI")
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().ApplyURI(db_url).SetServerAPIOptions(serverAPI)

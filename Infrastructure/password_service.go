@@ -6,12 +6,12 @@ import (
 )
 
 // HashPassword hashes a password using bcrypt
-func HashPassword(password string) (string, error) {
+func (*Infrastructure) HashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(hashedPassword), err
 }
 
 // ComparePasswords compares a hashed password with a plaintext password
-func ComparePasswords(hashedPassword, password string) error {
+func (*Infrastructure) ComparePasswords(hashedPassword string, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

@@ -12,3 +12,9 @@ type TaskUseCaseInterface interface {
 	UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error)
 	DeleteTask(id primitive.ObjectID) (interface{}, error)
 }
+
+type UserUseCaseInterface interface {
+	Register(user domain.User) (interface{}, error)
+	Login(user domain.User) (string, error)
+	Promote(user_id primitive.ObjectID) error
+}

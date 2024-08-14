@@ -11,8 +11,14 @@ import (
 //Implements the use cases related to tasks, such as creating, updating, retrieving, and deleting tasks.
 
 // Get all tasks
-func GetAlltasks() (datas []domain.Task, err error) {
-	result, err := repositories.GetAll()
+
+type TaskUseCase struct {
+	TaskRepository repositories.TaskRepositoryInterface
+	UserRepository repositories.UserRepositoryInterface
+}
+
+func (taskuseCase *TaskUseCase) GetAlltasks() (datas []domain.Task, err error) {
+	result, err := taskuseCase.TaskRepository.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -22,8 +28,8 @@ func GetAlltasks() (datas []domain.Task, err error) {
 
 // Get specific task
 
-func GetSpecificTask(id primitive.ObjectID) (datas domain.Task, err error) {
-	result, err := repositories.TaskRepository.GetSpecificTask(id)
+func (taskuseCase *TaskUseCase) GetSpecificTask(id primitive.ObjectID) (datas domain.Task, err error) {
+	result, err := taskuseCase.TaskRepository.GetSpecificTask(id)
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -31,8 +37,8 @@ func GetSpecificTask(id primitive.ObjectID) (datas domain.Task, err error) {
 }
 
 // Create task
-func CreateTask(task domain.Task) (interface{}, error) {
-	result, err := repositories.TaskRepository.CreateTask(task)
+func (taskuseCase *TaskUseCase) CreateTask(task domain.Task) (interface{}, error) {
+	result, err := taskuseCase.TaskRepository.CreateTask(task)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +46,8 @@ func CreateTask(task domain.Task) (interface{}, error) {
 }
 
 // Update task
-func UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error) {
-	result, err := repositories.TaskRepository.UpdateTask(id, task)
+func (taskuseCase *TaskUseCase) UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error) {
+	result, err := taskuseCase.TaskRepository.UpdateTask(id, task)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +55,8 @@ func UpdateTask(id primitive.ObjectID, task domain.Task) (interface{}, error) {
 }
 
 // Delete task
-func DeleteTask(id primitive.ObjectID) (interface{}, error) {
-	result, err := repositories.TaskRepository.DeleteTask(id)
+func (taskuseCase *TaskUseCase) DeleteTask(id primitive.ObjectID) (interface{}, error) {
+	result, err := taskuseCase.TaskRepository.DeleteTask(id)
 	if err != nil {
 		return nil, err
 	}
